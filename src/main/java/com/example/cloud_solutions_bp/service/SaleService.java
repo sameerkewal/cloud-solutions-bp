@@ -12,7 +12,7 @@ public class SaleService {
     private final SaleRepository saleRepository;
 
     public SaleService() {
-        this.saleRepository = new SaleRepository(JPAConfiguration.getEntityManager());
+        this.saleRepository = new SaleRepository(JPAConfiguration.getEntityManagerFactory().createEntityManager());
     }
 
     public Sale add(Sale sale){

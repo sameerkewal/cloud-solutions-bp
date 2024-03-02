@@ -11,7 +11,7 @@ public class ManufacturerService {
     private final ManufacturerRepository manufacturerRepository;
 
     public ManufacturerService() {
-        this.manufacturerRepository = new ManufacturerRepository(JPAConfiguration.getEntityManager());
+        this.manufacturerRepository = new ManufacturerRepository(JPAConfiguration.getEntityManagerFactory().createEntityManager());
 
 
     }

@@ -1,5 +1,6 @@
 package com.example.cloud_solutions_bp.entities;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 
 @Entity

@@ -1,7 +1,11 @@
 package com.example.cloud_solutions_bp.entities;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
+import java.sql.Time;
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -17,7 +21,7 @@ public class Sale {
 
     @Column(nullable = false)
 
-    private LocalDateTime sale_date;
+    private Timestamp sale_date;
 
 
     @ManyToOne
@@ -26,6 +30,7 @@ public class Sale {
 
 
     @OneToMany(mappedBy = "sale")
+    @JsonManagedReference //owning side of the relationship, basically the parent
     private Set<SaleProducts> saleProducts = new HashSet<>();
 
 
@@ -37,7 +42,13 @@ public class Sale {
         this.saleProducts = saleProducts;
     }
 
-    public Sale(LocalDateTime sale_date, Customer customer) {
+
+    public void addSaleProduct(SaleProducts saleProduct) {
+        saleProducts.add(saleProduct);
+        saleProduct.setSale(this);
+    }
+
+    public Sale(Timestamp sale_date, Customer customer) {
         this.sale_date = sale_date;
         this.customer = customer;
 //        this.products = products;
@@ -47,11 +58,11 @@ public class Sale {
 
     }
 
-    public LocalDateTime getSale_date() {
+    public Timestamp getSale_date() {
         return sale_date;
     }
 
-    public void setSale_date(LocalDateTime sale_date) {
+    public void setSale_date(Timestamp sale_date) {
         this.sale_date = sale_date;
     }
 
@@ -61,6 +72,13 @@ public class Sale {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    @PrePersist
+    public void prePersist() {
+        if (sale_date == null) {
+            sale_date = Timestamp.from(Instant.now());
+        }
     }
 
 

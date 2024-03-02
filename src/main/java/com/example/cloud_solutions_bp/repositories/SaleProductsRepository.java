@@ -1,20 +1,36 @@
 package com.example.cloud_solutions_bp.repositories;
 
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.Query;
 import com.example.cloud_solutions_bp.entities.Sale;
 import com.example.cloud_solutions_bp.entities.SaleProducts;
 
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+
+import jakarta.persistence.RollbackException;
+import org.hibernate.SessionFactory;
+import org.hibernate.exception.ConstraintViolationException;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 
 public class SaleProductsRepository extends Repository<SaleProducts>{
 
     private final EntityManager entityManager;
+
+
+
+
+
     public SaleProductsRepository(EntityManager entityManager) {
         super(entityManager);
         this.entityManager = entityManager;
+
     }
 
     @Override
@@ -69,7 +85,7 @@ public class SaleProductsRepository extends Repository<SaleProducts>{
             BigDecimal price = (BigDecimal) obj[3];
             BigDecimal totalSold = (BigDecimal) obj[4];
 
-            System.out.println(STR. "product: \{ name }, price: \{ price }, total items sold: \{ sum }, value of total sold: \{ totalSold }" );
+            System.out.println("product: " + name + ", price: " + price + ", total items sold: " + sum + ", value of total sold: " + totalSold);
 
         }
     }
@@ -88,9 +104,109 @@ public class SaleProductsRepository extends Repository<SaleProducts>{
                 String lastName = (String)obj[2];
                 BigDecimal totalWorth = (BigDecimal) obj[3];
 
-                System.out.println(STR."id:\{id}, name:\{firstName} \{lastName}, total spent:\{totalWorth}");
+                System.out.println( "id:" + id + ", name:" + firstName + " " + lastName + ", total spent:" + totalWorth);
+
+            }
+
+
+    }
+
+    public String sale_vw(){
+
+
+        EntityTransaction transaction = entityManager.getTransaction();
+        List<Object[]> resultList = new ArrayList<>();
+        JSONArray jsonArray = new JSONArray();
+
+        try {
+            if (!transaction.isActive()) {
+                transaction.begin();
+            }
+
+            Query query = entityManager.createQuery(
+                    "SELECT cmr.sle_id" +
+                            ", cmr.sale_date" +
+                            ", cmr.cmr_name " +
+                            ", total_items.total_items_in_order " +
+                            ", order_line.all_products_in_order " +
+                            ", unique_items.amount_unique_items_in_order " +
+                            ", sle_total.total_amount_sold " +
+                            "FROM (" +
+                            "   SELECT sle.customer.id AS cmr_id, sle.id AS sle_id, " +
+                            "          date_format(sle.sale_date, '%d-%m-%Y %H:%i:%s') AS sale_date, " +
+                            "          concat(cmr.firstname, ' ', cmr.lastname) AS cmr_name " +
+                            "   FROM Sale sle " +
+                            "   JOIN Customer cmr ON cmr.id = sle.customer.id" +
+                            ") cmr, (select   sle.id as sle_id\n" +
+                            "     ,        sum(sps.quantity) as total_items_in_order\n" +
+                            "     from     Sale sle\n" +
+                            "     join     SaleProducts sps on sle.id = sps.sale.id\n" +
+                            "     group by sle.id)total_items," +
+                            "(select       group_concat(concat(pdt.name, ' (', sps.quantity, ')')) as all_products_in_order\n" +
+                            "     ,        sle.id as sle_id\n" +
+                            "     from     Sale sle\n" +
+                            "     join     SaleProducts sps on sle.id = sps.sale.id\n" +
+                            "     join     Product pdt on sps.product.id = pdt.id\n" +
+                            "     group by sle_id)order_line," +
+                            "(select   sle.id as sle_id\n" +
+                            "     ,        count(distinct sps.product.id) as amount_unique_items_in_order\n" +
+                            "     from     Sale sle\n" +
+                            "     join     SaleProducts sps on sle.id = sps.sale.id\n" +
+                            "     group by sle.id)unique_items," +
+                            "(select    sle.id as sle_id\n" +
+                            "     ,         sum(sps.quantity * pdt.price) as total_amount_sold\n" +
+                            "     from     Sale sle\n" +
+                            "     join     SaleProducts sps on sle.id = sps.sale.id\n" +
+                            "     join     Product pdt on sps.product.id = pdt.id\n" +
+                            "     group by sle.id)sle_total   where cmr.sle_id=total_items.sle_id" +
+                            "                                  and order_line.sle_id=total_items.sle_id" +
+                            "                                  and unique_items.sle_id=total_items.sle_id" +
+                            "                                  and sle_total.sle_id=total_items.sle_id order by sle_total.sle_id desc"
+            );
+
+
+        resultList = query.getResultList();
+            jsonArray = new JSONArray();
+            for (Object[] obj : resultList) {
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("id", obj[0]);
+                jsonObject.put("name", obj[2]);
+                jsonObject.put("saleDate", obj[1]);
+                jsonObject.put("items", obj[4]);
+                jsonObject.put("totalAmountSold", obj[6]);
+                jsonObject.put("totalItemsInOrder", obj[3]);
+                jsonObject.put("uniqueItemsInOrder", obj[5]);
+
+                jsonArray.put(jsonObject);
+            }
+        entityManager.getTransaction().commit();
+
+
+        } catch (RollbackException re) {
+            if (re.getCause() instanceof ConstraintViolationException) {
+                if (transaction.isActive()) {
+                    transaction.rollback();
+                }
+
+                throw (ConstraintViolationException) re.getCause();
+            }
+
+            if (transaction.isActive()) {
+                transaction.rollback();
+            } else {
+                throw re;
+            }
+        }catch (NullPointerException npe){
+            npe.printStackTrace();
         }
 
+
+
+
+        String jsonString = jsonArray.toString();
+        System.out.println(jsonString);
+
+        return jsonString;
 
     }
 

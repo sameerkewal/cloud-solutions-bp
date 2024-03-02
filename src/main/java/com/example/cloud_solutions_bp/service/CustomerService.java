@@ -11,7 +11,7 @@ public class CustomerService {
     private final CustomerRepository customerRepository;
 
     public CustomerService(){
-        this.customerRepository = new CustomerRepository(JPAConfiguration.getEntityManager());
+        this.customerRepository = new CustomerRepository(JPAConfiguration.getEntityManagerFactory().createEntityManager());
     }
 
     public Customer addCustomer(Customer customer){
@@ -34,7 +34,7 @@ public class CustomerService {
         return customerRepository.findCustomersByFirstAndLastName(firstName, lastName);
     }
 
-    public void getAllCustomers(){
-        customerRepository.getAllCustomers();
+    public List<Customer> getAllCustomers(){
+        return customerRepository.getAllCustomers();
     }
 }

@@ -1,5 +1,6 @@
 package com.example.cloud_solutions_bp.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.List;
@@ -22,6 +23,7 @@ public class Adress {
     @Column(name = "neighborhood", nullable = true, length = 100)
     private String neighborhood;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "adress")
     private List<Customer> customers;
 

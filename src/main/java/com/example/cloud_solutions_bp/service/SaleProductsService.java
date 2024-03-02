@@ -14,7 +14,7 @@ public class SaleProductsService {
 
 
     public SaleProductsService() {
-        this.saleProductsRepository = new SaleProductsRepository(JPAConfiguration.getEntityManager());
+        this.saleProductsRepository = new SaleProductsRepository(JPAConfiguration.getEntityManagerFactory().createEntityManager());
 
     }
 
@@ -43,6 +43,10 @@ public class SaleProductsService {
 
     public List<SaleProducts> getSalesBasedOnDate(LocalDateTime localDateTime) {
         return saleProductsRepository.getSalesBasedOnDate(localDateTime);
+    }
+
+    public String sale_vw(){
+        return saleProductsRepository.sale_vw();
     }
 
 }

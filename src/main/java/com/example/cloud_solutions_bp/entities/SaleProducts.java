@@ -1,5 +1,6 @@
 package com.example.cloud_solutions_bp.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 
 
@@ -13,6 +14,7 @@ public class SaleProducts {
 
 
     @ManyToOne
+    @JsonBackReference //the child side of the relationship
     @JoinColumn(name = "sale_id", nullable = false)
     private Sale sale;
 

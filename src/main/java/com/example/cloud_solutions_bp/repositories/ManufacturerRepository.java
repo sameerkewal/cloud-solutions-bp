@@ -1,14 +1,18 @@
 package com.example.cloud_solutions_bp.repositories;
 
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.Query;
 import com.example.cloud_solutions_bp.entities.Manufacturer;
+import jakarta.persistence.RollbackException;
+import org.hibernate.exception.ConstraintViolationException;
 
 import java.util.List;
 
-public class ManufacturerRepository extends Repository<Manufacturer>{
+public class ManufacturerRepository extends Repository<Manufacturer> {
 
     private EntityManager entityManager;
+
     public ManufacturerRepository(EntityManager entityManager) {
 
         super(entityManager);
@@ -16,12 +20,16 @@ public class ManufacturerRepository extends Repository<Manufacturer>{
     }
 
 
-
     @Override
     public Manufacturer update(Manufacturer manufacturer) {
+        EntityTransaction transaction = entityManager.getTransaction();
+
 
         try {
-            entityManager.getTransaction().begin();
+            if (!transaction.isActive()) {
+                transaction.begin();
+            }
+
             Manufacturer manufacturerToUpdate = find(manufacturer.getId(), Manufacturer.class);
 
             manufacturerToUpdate.setName(manufacturer.getName());
@@ -29,11 +37,20 @@ public class ManufacturerRepository extends Repository<Manufacturer>{
 
             entityManager.getTransaction().commit();
 
-        } catch (Exception e) {
-            if (entityManager.getTransaction().isActive()) {
-                entityManager.getTransaction().rollback();
+        } catch (RollbackException re) {
+            if (re.getCause() instanceof ConstraintViolationException) {
+                if (transaction.isActive()) {
+                    transaction.rollback();
+                }
+
+                throw (ConstraintViolationException) re.getCause();
             }
-            System.out.println(e.getMessage());
+
+            if (transaction.isActive()) {
+                transaction.rollback();
+            } else {
+                throw re;
+            }
         }
         return find(manufacturer.getId(), Manufacturer.class);
 
@@ -58,11 +75,18 @@ public class ManufacturerRepository extends Repository<Manufacturer>{
     }
 
     public List<Manufacturer> getAllManufacturers() {
-        this.entityManager.getTransaction().begin();
-        Query query = entityManager.createQuery("select mfr from Manufacturer mfr");
-        List<Manufacturer> resultList = query.getResultList();
-        entityManager.getTransaction().commit();
+        try {
+            this.entityManager.getTransaction().begin();
+            Query query = entityManager.createQuery("select mfr from Manufacturer mfr");
+            List<Manufacturer> resultList = query.getResultList();
+            entityManager.getTransaction().commit();
 
-        return resultList;
+            return resultList;
+        } catch (Exception e) {
+            if (entityManager.getTransaction().isActive()) {
+                entityManager.getTransaction().rollback();
+            }
+        }
+        return null;
     }
 }

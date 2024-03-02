@@ -1,18 +1,28 @@
 package com.example.cloud_solutions_bp.repositories;
 
+import com.example.cloud_solutions_bp.entities.Customer;
+import com.example.cloud_solutions_bp.util.Util;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.Query;
 import com.example.cloud_solutions_bp.entities.Product;
+import jakarta.persistence.RollbackException;
+import org.hibernate.exception.ConstraintViolationException;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ProductRepository extends Repository<Product> {
 
     private EntityManager entityManager;
+    private final Util util;
 
     public ProductRepository(EntityManager entityManager) {
         super(entityManager);
         this.entityManager = entityManager;
+        util = new Util();
     }
 
     @Override
@@ -64,6 +74,95 @@ public class ProductRepository extends Repository<Product> {
         this.entityManager.getTransaction().commit();
         return resultList;
     }
+
+    public String getAllProducts() {
+        EntityTransaction transaction = entityManager.getTransaction();
+        List<Object[]> resultList = new ArrayList<>();
+        JSONArray jsonArray = new JSONArray();
+        try {
+            if (!transaction.isActive()) {
+                transaction.begin();
+            }
+            Query query = entityManager.createQuery("select  pdt.id, " +
+                    "                                           pdt.name, " +
+                    "                                           pdt.price, " +
+                    "                                           pdt.manufacturer.name " +
+                                                        ",      pdt.manufacturer.country" +
+                    "                                   from    Product pdt");
+            resultList = query.getResultList();
+            jsonArray = new JSONArray();
+
+            for (Object[] obj : resultList) {
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("id", obj[0]);
+                jsonObject.put("name", obj[1]);
+                jsonObject.put("price", obj[2]);
+                jsonObject.put("manufacturerName", obj[3]);
+                jsonObject.put("manufacturerCountry", obj[4]);
+
+
+                jsonArray.put(jsonObject);
+            }
+
+
+            entityManager.getTransaction().commit();
+
+
+        } catch (RollbackException re) {
+            util.handleRollBackException(re, transaction);
+        }
+
+        String jsonString = jsonArray.toString();
+        System.out.println(jsonString);
+        return jsonString;
+
+    }
+
+    public String getProduct(Long id) {
+        EntityTransaction transaction = entityManager.getTransaction();
+        List<Object[]> resultList = new ArrayList<>();
+        JSONArray jsonArray = new JSONArray();
+        try {
+            if (!transaction.isActive()) {
+                transaction.begin();
+            }
+            Query query = entityManager.createQuery("select  pdt.id, " +
+                    "                                           pdt.name, " +
+                    "                                           pdt.price, " +
+                    "                                           pdt.manufacturer.name " +
+                                                        ",      pdt.manufacturer.country" +
+                    "                                   from    Product pdt" +
+                    "                                   where   pdt.id=:p1");
+            query.setParameter("p1", id);
+            resultList = query.getResultList();
+            jsonArray = new JSONArray();
+
+            for (Object[] obj : resultList) {
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("id", obj[0]);
+                jsonObject.put("name", obj[1]);
+                jsonObject.put("price", obj[2]);
+                jsonObject.put("manufacturerName", obj[3]);
+                jsonObject.put("manufacturerCountry", obj[4]);
+
+
+                jsonArray.put(jsonObject);
+            }
+
+
+            entityManager.getTransaction().commit();
+
+
+        } catch (RollbackException re) {
+            util.handleRollBackException(re, transaction);
+        }
+
+        String jsonString = jsonArray.toString();
+        System.out.println(jsonString);
+        return jsonString;
+
+    }
+
 
 }
 

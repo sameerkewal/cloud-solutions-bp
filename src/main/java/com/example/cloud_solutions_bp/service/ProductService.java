@@ -12,7 +12,7 @@ public class ProductService {
 
 
     public ProductService() {
-        this.productRepository = new ProductRepository(JPAConfiguration.getEntityManager());
+        this.productRepository = new ProductRepository(JPAConfiguration.getEntityManagerFactory().createEntityManager());
     }
 
 
@@ -35,5 +35,14 @@ public class ProductService {
 
     public List<Product>getProductByName(String productName){
         return productRepository.getProductByName(productName);
+    }
+
+    public String getAllProducts() {
+
+        return productRepository.getAllProducts();
+    }
+    public String getProduct(Long id) {
+
+        return productRepository.getProduct(id);
     }
 }

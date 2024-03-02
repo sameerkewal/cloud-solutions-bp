@@ -45,7 +45,7 @@ public class JPAConfiguration {
         }
     }
 
-    private EntityManagerFactory getEntityManagerFactory() {
+    public static EntityManagerFactory getEntityManagerFactory() {
         initialize();
         return factory;
     }

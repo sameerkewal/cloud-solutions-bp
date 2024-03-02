@@ -8,7 +8,8 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="styles.css">
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-        <script src="script.js"></script>
+        <script src="scripts.js"></script>
+        <script src="api.js"></script>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     </head>
     <body>
@@ -17,7 +18,7 @@
                 <img id="logo" src="https://unasat.net/wp-content/uploads/2021/04/rsz_unasat_2021-unasat_name2.png" alt="Simple Sales App Logo">
             </div>
             <div id="right">
-                <h1>UBuy</h1>
+                <h1>UBuyss</h1>
                 <nav>
                     <ul>
                         <li><a href="#sales-header"><i class="fas fa-chevron-down"></i> Sales</a></li>
@@ -80,17 +81,22 @@
       <form id="addManufacturerForm">
           <label for="manufacturerId">ID:</label>
         <input type="text" name="id" id="manufacturerId" value="">
-        <label for="name">Name:</label>
-        <input type="text" id="name" name="name" required><br>
+        <label for="manufacturer-name">Name:</label>
+        <input type="text" id="manufacturer-name" name="name" required><br>
         <label for="country">Country:</label>
         <input type="text" id="country" name="country" required><br>
-        <button type="submit" id="add-manufacturer">Add Manufacturer</button>
-        <button type="submit" id="update-manufacturer">Update Manufacturer</button>
-        <button type="submit" id="delete-manufacturer">Delete Manufacturer</button>
+        <button type="submit" id="add-manufacturer" data-action="add">Add Manufacturer</button>
+        <button type="submit" id="update-manufacturer" data-action="update">Update Manufacturer</button>
+        <button type="submit" id="delete-manufacturer" data-action="delete">Delete Manufacturer</button>
       </form>
     </div>
   </div>
-  
+
+<!--    Success Dialogue-->
+        <div id="messageModal">
+            <p id="messageText"></p>
+            <button onclick="closeMessageModal()">Close</button>
+        </div>
 
 
 
