@@ -1,10 +1,10 @@
 package com.example.cloud_solutions_bp.repositories;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.Query;
+import com.example.cloud_solutions_bp.util.Util;
+import jakarta.persistence.*;
 import com.example.cloud_solutions_bp.entities.Adress;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -12,12 +12,16 @@ public class AdresRepository extends Repository<Adress> {
 
     private EntityManager entityManager;
     private EntityManagerFactory emf;
+    private final Util util;
+
 
 
 
     public AdresRepository(EntityManager entityManager) {
         super(entityManager);
-      this.entityManager = entityManager;
+        this.entityManager = entityManager;
+        util = new Util();
+
     }
 
     @Override
@@ -87,5 +91,25 @@ public class AdresRepository extends Repository<Adress> {
     }
 
 
+    public List<Adress> getAllAddresses() {
+        EntityTransaction transaction = entityManager.getTransaction();
+        List<Adress> resultList = new ArrayList<>();
 
+        try {
+            if (!transaction.isActive()) {
+                transaction.begin();
+            }
+            Query query = entityManager.createQuery("select adr from Adress adr");
+            resultList = query.getResultList();
+            entityManager.getTransaction().commit();
+
+
+        } catch (RollbackException re) {
+            util.handleRollBackException(re, transaction);
+        }
+
+        return resultList;
+
+
+    }
 }

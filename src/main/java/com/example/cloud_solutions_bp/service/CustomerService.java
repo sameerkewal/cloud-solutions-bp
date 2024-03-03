@@ -34,7 +34,7 @@ public class CustomerService {
         return customerRepository.findCustomersByFirstAndLastName(firstName, lastName);
     }
 
-    public List<Customer> getAllCustomers(){
+    public String getAllCustomers(){
         return customerRepository.getAllCustomers();
     }
 }

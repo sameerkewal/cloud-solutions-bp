@@ -23,7 +23,7 @@ public class CustomerController {
     @Path("/get-all-customers")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public List<Customer>getAllCustomers(){
+    public String getAllCustomers(){
         return customerService.getAllCustomers();
     }
 

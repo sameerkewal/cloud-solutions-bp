@@ -12,7 +12,7 @@ public class AdressService {
 
 
     public AdressService() {
-        this.adresRepository = new AdresRepository(JPAConfiguration.getEntityManager());
+        this.adresRepository = new AdresRepository(JPAConfiguration.getEntityManagerFactory().createEntityManager());
 
     }
 
@@ -42,6 +42,11 @@ public class AdressService {
 
     public Adress findAdressesByStreetNameAndHouseNumber(String streetName, int houseNumber){
         return adresRepository.findAdressByStreetNameAndHouseNumber(streetName, houseNumber);
+    }
+
+
+    public List<Adress>getAllAddresses(){
+        return adresRepository.getAllAddresses();
     }
 
 
