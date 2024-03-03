@@ -89,6 +89,20 @@ public class ProductRepository extends Repository<Product> {
                     "                                           pdt.manufacturer.name " +
                                                         ",      pdt.manufacturer.country" +
                     "                                   from    Product pdt");
+
+            query = entityManager.createQuery("select sps.product_id                                     AS product_id,\n" +
+                    "       p.name                                             AS name,\n" +
+                    "       sps.total_sold                                     AS total_sold,\n" +
+                    "       p.price                                            AS price,\n" +
+                    "       (sps.total_sold * p.price)                     AS total,\n" +
+                    "       mfr.name,\n" +
+                    "       mfr.country\n" +
+                    "from (select sps.product.id    AS product_id,\n" +
+                    "              sum(sps.quantity) AS total_sold\n" +
+                    "       from SaleProducts sps\n" +
+                    "       group by sps.product.id) sps join Product p\n" +
+                    "      on (p.id = sps.product_id)" +
+                    "join Manufacturer  mfr on p.manufacturer.id = mfr.id");
             resultList = query.getResultList();
             jsonArray = new JSONArray();
 
@@ -96,9 +110,11 @@ public class ProductRepository extends Repository<Product> {
                 JSONObject jsonObject = new JSONObject();
                 jsonObject.put("id", obj[0]);
                 jsonObject.put("name", obj[1]);
-                jsonObject.put("price", obj[2]);
-                jsonObject.put("manufacturerName", obj[3]);
-                jsonObject.put("manufacturerCountry", obj[4]);
+                jsonObject.put("totalSold", obj[2]);
+                jsonObject.put("price", obj[3]);
+                jsonObject.put("totalValue", obj[4]);
+                jsonObject.put("manufacturerName", obj[5]);
+                jsonObject.put("manufacturerCountry", obj[6]);
 
 
                 jsonArray.put(jsonObject);
