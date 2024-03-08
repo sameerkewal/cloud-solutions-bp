@@ -164,9 +164,6 @@ function disableProductInOtherSelectLists(selectList) {
                 value: selectedValue
             });
         }
-
-        console.log(`after adding:`)
-        console.log(addedProducts)
     });
 }
 
