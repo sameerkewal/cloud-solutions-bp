@@ -11,16 +11,13 @@ public class Util {
 
     public void handleRollBackException(RollbackException re, EntityTransaction transaction){
         if (re.getCause() instanceof ConstraintViolationException) {
-            if (transaction.isActive()) {
                 transaction.rollback();
-            }
-
             throw (ConstraintViolationException) re.getCause();
         }
 
-        if (transaction.isActive()) {
+         else {
             transaction.rollback();
-        } else {
+
             throw re;
         }
     }

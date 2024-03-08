@@ -1,5 +1,6 @@
 package com.example.cloud_solutions_bp.repositories;
 
+import com.example.cloud_solutions_bp.util.Util;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.PersistenceException;
@@ -12,9 +13,12 @@ public abstract class Repository<T> {
 
     private EntityManager entityManager;
 
+    private Util util;
+
     public Repository(EntityManager entityManager){
 
         this.entityManager = entityManager;
+        this.util = new Util();
     }
 
     public T add(T object) {
@@ -29,19 +33,7 @@ public abstract class Repository<T> {
             addedObject = entityManager.merge(object);
             transaction.commit();
         } catch (RollbackException re) {
-            if (re.getCause() instanceof ConstraintViolationException) {
-                if (transaction.isActive()) {
-                    transaction.rollback();
-                }
-
-                throw (ConstraintViolationException) re.getCause();
-            }
-
-            if (transaction.isActive()) {
-                transaction.rollback();
-            } else {
-                throw re;
-            }
+            util.handleRollBackException(re, transaction);
         }
 
         return addedObject;
@@ -49,30 +41,23 @@ public abstract class Repository<T> {
 
 
     public void delete(T object) {
-        EntityTransaction transaction = entityManager.getTransaction();
-
             try {
-                if (!transaction.isActive()) {
-                    transaction.begin();
-                }
-
+                entityManager.getTransaction().begin();
                 entityManager.remove(object);
                 entityManager.getTransaction().commit();
 
-            } catch (RollbackException re) {
-                if (re.getCause() instanceof ConstraintViolationException) {
-                    if (transaction.isActive()) {
-                        transaction.rollback();
-                    }
+            }catch(RollbackException re){
+                if(re.getCause() instanceof ConstraintViolationException){
+                    entityManager.getTransaction().rollback();
+                    throw(ConstraintViolationException)re.getCause();
 
-                    throw (ConstraintViolationException) re.getCause();
-                }
+                }if(entityManager.getTransaction().isActive()){
+                    entityManager.getTransaction().rollback();
 
-                if (transaction.isActive()) {
-                    transaction.rollback();
-                } else {
+                }else{
                     throw re;
                 }
+
             }
     }
 

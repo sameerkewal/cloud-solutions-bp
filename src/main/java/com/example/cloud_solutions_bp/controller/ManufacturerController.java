@@ -85,7 +85,15 @@ public class ManufacturerController {
     public Response addManufacturer(Manufacturer newManufacturer) {
         try {
             // Perform any validation or business logic as needed
-            // For simplicity, let's assume the ManufacturerService has a method to add a new manufacturer
+
+            //first check if the mfr name already exists
+            if(manufacturerService.hasExistingName(newManufacturer)){
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                        .entity("{\"error\": \"" + "Manufacturer with this name already exists!" + "\"}")
+                        .type(MediaType.APPLICATION_JSON_TYPE)
+                        .build();
+            }
+
             manufacturerService.addManufacturer(newManufacturer);
 
             // Return a success response with the newly added manufacturer

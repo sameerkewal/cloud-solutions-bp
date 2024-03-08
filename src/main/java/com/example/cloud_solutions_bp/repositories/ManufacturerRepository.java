@@ -1,5 +1,6 @@
 package com.example.cloud_solutions_bp.repositories;
 
+import com.example.cloud_solutions_bp.util.Util;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.Query;
@@ -12,11 +13,15 @@ import java.util.List;
 public class ManufacturerRepository extends Repository<Manufacturer> {
 
     private EntityManager entityManager;
+    private final Util util;
+
 
     public ManufacturerRepository(EntityManager entityManager) {
 
         super(entityManager);
         this.entityManager = entityManager;
+        util = new Util();
+
     }
 
 
@@ -38,19 +43,8 @@ public class ManufacturerRepository extends Repository<Manufacturer> {
             entityManager.getTransaction().commit();
 
         } catch (RollbackException re) {
-            if (re.getCause() instanceof ConstraintViolationException) {
-                if (transaction.isActive()) {
-                    transaction.rollback();
-                }
+            util.handleRollBackException(re, transaction);
 
-                throw (ConstraintViolationException) re.getCause();
-            }
-
-            if (transaction.isActive()) {
-                transaction.rollback();
-            } else {
-                throw re;
-            }
         }
         return find(manufacturer.getId(), Manufacturer.class);
 
@@ -88,5 +82,27 @@ public class ManufacturerRepository extends Repository<Manufacturer> {
             }
         }
         return null;
+    }
+
+    public boolean hasExistingName(Manufacturer manufacturer){
+        try {
+            this.entityManager.getTransaction().begin();
+            Query query = entityManager.createQuery("select mfr from Manufacturer mfr where mfr.name = :p1");
+            query.setParameter("p1", manufacturer.getName());
+            List<Manufacturer> resultList = query.getResultList();
+            entityManager.getTransaction().commit();
+
+            if(!resultList.isEmpty()){
+                return true;
+            }
+            return false;
+
+        } catch (Exception e) {
+            if (entityManager.getTransaction().isActive()) {
+                entityManager.getTransaction().rollback();
+                return false;
+            }
+        }
+        return false;
     }
 }

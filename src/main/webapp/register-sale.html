@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sale Registration</title>
+  <link rel="stylesheet" href="register-sale.css">
+  <script src = "sales.js"></script>
+  <script src = "script.js"></script>
+  <script src = "sales-api.js"></script>
+  <!-- Add your stylesheets or styling here -->
+</head>
+<body>
+
+
+<header>
+  <h1 id="UBuy"><a href="index.html">UBuy</a></h1>
+  <h1>Sale Registration</h1>
+</header>
+
+<form id="saleForm">
+  <!-- Sale Information -->
+<!--  <label for="saleDate">Sale Date:</label>-->
+<!--  <input type="date" id="saleDate" name="saleDate" required>-->
+
+  <label for="customerName">Customer Name:</label>
+<!--  <input type="text" id="customerName" name="customerName" required>-->
+  <select id="customerName" name="customerName" required>
+    <option selected disabled value="-1">Select Customer</option>
+  </select>
+  <!-- Sale Items -->
+  <div id="saleItems">
+    <div class="sale-item">
+      <label for="productSelectList">Product Name:</label>
+<!--      <input type="text" class="productName" name="productName" id="productName" required>-->
+      <select id="productSelectList" name="productSelectList" class="productSelectList" required>
+        <option value="-1" selected disabled>Select Product</option>
+      </select>
+
+      <label for="quantity">Quantity:</label>
+      <input type="number" class="quantity small-input" name="quantity" id="quantity" required>
+
+      <label for="price">Price per item:</label>
+      <input type="text" class="price small-input" name="price" step="0.01" id="price" readonly>
+
+      <label for="totalPrice">Total Price:</label>
+      <input type="text" class="totalPrice small-input" name="totalPrice" step="0.01" id="totalPrice" readonly>
+    </div>
+  </div>
+<div id="footer">
+  <div id="buttonContainer">
+    <button type="button" id="addSaleItem">Add Sale Item</button>
+    <button type="button" id="removeSaleItem">Remove Sale Item</button>
+    <!-- Submit Button -->
+    <button type="submit" id="registerSale">Register Sale</button>
+  </div>
+  <div id="totalAmountDiv">
+    <label for="totalAmount">Total Amount:</label><input type="text" class="totalAmount small-input" name="totalAmount" step="0.01" id="totalAmount" readonly>
+  </div>
+</div>
+</form>
+<div id="messageModal">
+  <p id="messageText"></p>
+  <button id="message-button" onclick="closeMessageModal()">Close</button>
+</div>
+<!-- Add your scripts here -->
+
+</body>
+</html>

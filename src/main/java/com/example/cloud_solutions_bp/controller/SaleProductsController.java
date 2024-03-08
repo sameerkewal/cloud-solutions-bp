@@ -23,11 +23,10 @@ public class SaleProductsController {
     @Produces(MediaType.APPLICATION_JSON)
     public Response addSaleProduct(SaleProducts newSaleproduct) {
         try {
-            // Perform any validation or business logic as needed
-            // For simplicity, let's assume the ManufacturerService has a method to add a new manufacturer
+
             SaleProducts addedSaleProduct = saleProductsService.add(newSaleproduct);
 
-            // Return a success response with the newly added manufacturer
+            // Return a success response with the newly added saleProduct
             return Response.status(Response.Status.CREATED).entity(addedSaleProduct).build();
         } catch (Exception e) {
             // Handle exceptions and return an error response

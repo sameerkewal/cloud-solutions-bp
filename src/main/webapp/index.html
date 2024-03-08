@@ -8,42 +8,72 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="styles.css">
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-        <script src="scripts.js"></script>
-        <script src="api.js"></script>
+        <script src="script.js"></script>
+        <script src="manufacturer-api.js"></script>
+        <script src="sales-api.js"></script>
+        <script src="sales.js"></script>
+        <script src="manufacturer.js"></script>
+        <script src="address-api.js"></script>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     </head>
     <body>
-        <div id="header">
-            <div id="left">
-                <img id="logo" src="https://unasat.net/wp-content/uploads/2021/04/rsz_unasat_2021-unasat_name2.png" alt="Simple Sales App Logo">
-            </div>
-            <div id="right">
-                <h1>UBuyss</h1>
-                <nav>
-                    <ul>
-                        <li><a href="#sales-header"><i class="fas fa-chevron-down"></i> Sales</a></li>
-                        <li><a href="#product-header"><i class="fas fa-chevron-down"></i> Products</a></li>
-                        <li><a href="#manufacturer-header"><i class="fas fa-chevron-down"></i> Manufacturers</a></li>
-                        <li><a href="#customer-header"><i class="fas fa-chevron-down"></i> Customers</a></li>
-                        <li><a href="#Adress-header"><i class="fas fa-chevron-down"></i> Addresses</a></li>
-                        <li><a href="#About Us"><i class="fas fa-chevron-down"></i> About Us</a></li>
-                    </ul>
-                </nav>
-            </div>
+    <div id="header">
+        <div id="brand">
+            <h1 id="main-UBuy"><a href="index.html">UBuy</a></h1>
+            <nav>
+                <ul>
+                    <li><a href="#sales-header"><i class="fas fa-chevron-down"></i> Sales</a></li>
+                    <li><a href="#product-header"><i class="fas fa-chevron-down"></i> Products</a></li>
+                    <li><a href="#manufacturer-header"><i class="fas fa-chevron-down"></i> Manufacturers</a></li>
+                    <li><a href="#customer-header"><i class="fas fa-chevron-down"></i> Customers</a></li>
+                    <li><a href="#adress-header"><i class="fas fa-chevron-down"></i> Addresses</a></li>
+                    <li><a href="about-us.html"><i class="fas fa-chevron-down"></i> About Us</a></li>
+                </ul>
+            </nav>
         </div>
+    </div>
 
         <h2 id="sales-header"><i class="fas fa-chevron-down sle"></i> Sales</h2>
         <div id="sales">
             <!-- Sales will be dynamically populated here -->
-            <canvas id="ordersChart"></canvas>
+<!--            <canvas id="ordersChart"></canvas>-->
+            <input type="text" id="sales-search-input" placeholder="search">
+            <button id="add-sale" onclick="redirectToSalePage()">Add</button>
+            <table id="sales-table">
+                <thead>
+                <tr>
+                    <th>Sale Date</th>
+                    <th>Customer Name</th>
+                    <th>Total Amount</th>
+                    <th>Total Quantity</th>
+                    <th>Total Unique Items</th>
+                    <th>Items</th>
+                </tr>
+                </thead>
+                <tbody>
+
+                </tbody>
+            </table>
         </div>
 
         <h2 id="product-header"><i class="fas fa-chevron-down prod"></i> Products</h2>
         <div id="products">
             <!-- Products will be dynamically populated here -->
+            <input type="text" id="product-search-input" placeholder="search">
+            <table id="product-table">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Price</th>
+                    <th>Total Sold</th>
+                    <th>Total Value</th>
+                    <th>Manufacturer</th>
+                </tr>
+                </thead>
+            </table>
         </div>
 
-        <h1 id="manufacturer-header"><i class="fas fa-chevron-down man"></i> Manufacturers</h1>
+        <h2 id="manufacturer-header"><i class="fas fa-chevron-down man"></i> Manufacturers</h2>
         <div id="manufacturers">
             <input type="text" id="searchInput" placeholder="Search...">
             <button id="addManufacturer">Add</button>
@@ -61,15 +91,36 @@
             </table>
         </div>
 
-
-        <h2 id="customer-header"><i class="fas fa-chevron-down cus"></i> Customers</h2>
+        <h2 id="customer-header"><i class="fas fa-chevron-down cus"></i>Customers</h2>
         <div id="customers">
+            <input type="text" id="customer-search-input" placeholder="search">
+            <table id="customersTable">
+                <thead>
+                    <tr>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Phone Number</th>
+                        <th>Adress</th>
+                        <th>Total Spent</th>
+                    </tr>
+                </thead>
+            </table>
             <!-- Content here -->
         </div>
 
-        <h2 id="adress-header"><i class="fas fa-chevron-down cus adr"></i> Addresses</h2>
+        <h2 id="adress-header"><i class="fas fa-chevron-down adr"></i> Addresses</h2>
         <div id="addresses">
             <!-- Content here -->
+            <input type="text" id="adress-search-input" placeholder="search">
+            <table id="adressTable">
+                <thead>
+                <tr>
+                    <th>Street Name</th>
+                    <th>House Number</th>
+                    <th>Neighborhood</th>
+                </tr>
+                </thead>
+            </table>
         </div>
 
         <!-- Add modal -->
@@ -79,8 +130,8 @@
       <h2>Add Manufacturer</h2>
       <!-- Add manufacturer form -->
       <form id="addManufacturerForm">
-          <label for="manufacturerId">ID:</label>
-        <input type="text" name="id" id="manufacturerId" value="">
+<!--          <label for="manufacturerId">ID:</label>-->
+        <input type="hidden" name="id" id="manufacturerId" value="">
         <label for="manufacturer-name">Name:</label>
         <input type="text" id="manufacturer-name" name="name" required><br>
         <label for="country">Country:</label>
@@ -95,7 +146,7 @@
 <!--    Success Dialogue-->
         <div id="messageModal">
             <p id="messageText"></p>
-            <button onclick="closeMessageModal()">Close</button>
+            <button id="message-button" onclick="closeMessageModal()">Close</button>
         </div>
 
 

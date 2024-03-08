@@ -83,14 +83,8 @@ public class ProductRepository extends Repository<Product> {
             if (!transaction.isActive()) {
                 transaction.begin();
             }
-            Query query = entityManager.createQuery("select  pdt.id, " +
-                    "                                           pdt.name, " +
-                    "                                           pdt.price, " +
-                    "                                           pdt.manufacturer.name " +
-                                                        ",      pdt.manufacturer.country" +
-                    "                                   from    Product pdt");
 
-            query = entityManager.createQuery("select sps.product_id                                     AS product_id,\n" +
+           Query query = entityManager.createQuery("select sps.product_id                                     AS product_id,\n" +
                     "       p.name                                             AS name,\n" +
                     "       sps.total_sold                                     AS total_sold,\n" +
                     "       p.price                                            AS price,\n" +
@@ -129,7 +123,6 @@ public class ProductRepository extends Repository<Product> {
         }
 
         String jsonString = jsonArray.toString();
-        System.out.println(jsonString);
         return jsonString;
 
     }
@@ -174,7 +167,6 @@ public class ProductRepository extends Repository<Product> {
         }
 
         String jsonString = jsonArray.toString();
-        System.out.println(jsonString);
         return jsonString;
 
     }

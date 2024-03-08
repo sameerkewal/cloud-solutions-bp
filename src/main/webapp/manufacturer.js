@@ -1,25 +1,4 @@
-document.addEventListener("DOMContentLoaded", ()=>{
-    populateManufacturers()
-    manufacturerModal()
-    populateChart();
-
-    genericCollapse("manufacturers", "manufacturer-header", "man");
-    genericCollapse("customers", "customer-header", "cus");
-    genericCollapse("products", "product-header", "prod")
-    genericCollapse("sales", "sales-header", "sle")
-    genericCollapse("addresses", "adress-header", "adr")
-
-    // handleDeleteButtonClick();
-
-
-
-})
-
-
-
-
 function populateManufacturers(){
-
 
     getAllManufacturers().then(data=>{
         const tableBody = document.querySelector("#manufacturersTable tbody");
@@ -54,46 +33,23 @@ function populateManufacturers(){
             row.appendChild(nameColumn);
             row.appendChild(countryColumn);
             tableBody.appendChild(row);
-
-
-
         })
-
-
-
-
         searchManufacturer();
     })
 
 }
-function genericCollapse(content, header, icon){
-    const contentElement = document.getElementById(content);
-    const headerElement = document.getElementById(header);
-    const iconElement = document.getElementsByClassName(icon)[0];
 
+function retrieveData(id){
 
-
-    console.log(contentElement.style.display);
-
-    headerElement.addEventListener("click", () => {
-        if (contentElement.style.display === "none" || contentElement.style.display === null) {
-            contentElement.style.display = "block";
-            iconElement.classList.remove('fa-chevron-up');
-            iconElement.classList.add('fa-chevron-down');
-        } else {
-            contentElement.style.display = "none";
-            iconElement.classList.remove('fa-chevron-down');
-            iconElement.classList.add('fa-chevron-up');
-        }
+    const modal = document.getElementById("addModal");
+    const idInput = modal.querySelector("#manufacturerId");
+    const name =   modal.querySelector("#manufacturer-name");
+    const country = modal.querySelector("#country")
+    getManufacturer(id).then((data)=>{
+        name.value = data.name
+        country.value = data.country
     })
 }
-
-
-
-
-
-
-
 function searchManufacturer() {
     const searchInput = document.getElementById('searchInput');
     const table = document.getElementById('manufacturersTable');
@@ -121,39 +77,6 @@ function searchManufacturer() {
         });
     });
 }
-
-function populateChart(){
-
-    const ordersData = [{ week: "Week 1", orders: 2000 }];
-
-    const ctx = document.getElementById('ordersChart').getContext('2d');
-    const chart = new Chart(ctx, {
-        type: 'pie', // Change this line
-        data: {
-            labels: ordersData.map(data => data.week),
-            datasets: [{
-                label: 'Orders',
-                data: ordersData.map(data => data.orders),
-                backgroundColor: [
-                    'rgba(0, 99, 132, 0.2)',
-                    'rgba(54, 162, 235, 0.2)',
-                    'rgba(255, 206, 86, 0.2)',
-                    'rgba(75, 192, 192, 0.2)'
-                ],
-                borderColor: [
-                    'rgba(255, 99, 132, 1)',
-                    'rgba(54, 162, 235, 1)',
-                    'rgba(255, 206, 86, 1)',
-                    'rgba(75, 192, 192, 1)'
-                ],
-                borderWidth: 1
-            }]
-        },
-    });
-
-
-}
-
 
 function manufacturerModal(){
     const modal = document.getElementById("addModal");
@@ -207,7 +130,7 @@ function handleButtonActions(){
 
         switch (action) {
             case 'add':
-                // handleAddManufacturer();
+                handleAddManufacturer();
                 break;
             case 'update':
                 handleUpdateManufacturer();
@@ -241,17 +164,7 @@ function editManufacturer(manufacturerId){
 
 
 
-function retrieveData(id){
 
-    const modal = document.getElementById("addModal");
-    const idInput = modal.querySelector("#manufacturerId");
-    const name =   modal.querySelector("#manufacturer-name");
-    const country = modal.querySelector("#country")
-    getManufacturer(id).then((data)=>{
-        name.value = data.name
-        country.value = data.country
-    })
-}
 
 function clearValues(){
     const modal = document.getElementById("addModal");
@@ -278,23 +191,24 @@ async function handleDeleteButtonManufacturer() {
     try {
         // Call the deleteManufacturer function
         const deletedManufacturer = await deleteManufacturer(manufacturerId);
-        console.log(deletedManufacturer);
+      
 
         // Show a success message or perform additional actions on success
         showMessage('Manufacturer deleted successfully!', 'success');
     } catch (error) {
         // Handle errors
-        console.error('Error:', error.message);
+        const errorMessage = JSON.parse(error.message);
+        console.log(errorMessage.message);
 
         // Show the error message to the user
-        showMessage(error, 'failed');
+        showMessage(errorMessage.message, 'failed');
 
     }
 }
 async function handleUpdateManufacturer() {
     const manufacturerId = document.getElementById("manufacturerId").value;
-    const updatedName = document.getElementById("manufacturer-name")
-    const updatedCountry = document.getElementById("country");
+    const updatedName = document.getElementById("manufacturer-name").value
+    const updatedCountry = document.getElementById("country").value;
 
     const updatedData = {
         name: updatedName,
@@ -308,33 +222,34 @@ async function handleUpdateManufacturer() {
         showMessage('Manufacturer updated successfully!', 'success');
     } catch (error) {
         // Handle errors
-        console.error('Error updating manufacturer:', error.message);
+        const errorMessage = JSON.parse(error.message);
+        console.log(errorMessage.message);
 
         // Show the error message to the user
-        showMessage(error, 'failed');
+        showMessage(errorMessage.message, 'failed');
     }
 
 }
 
+async function handleAddManufacturer(){
+    const newName = document.getElementById("manufacturer-name").value;
+    const newCountry = document.getElementById("country").value;
 
-function closeMessageModal(){
-    document.getElementById('messageModal').style.display = 'none';
-    // window.location.href="http://localhost:63342/html/index.html"
-    location.reload()
-}
+    const newManufacturer = {
+        name: newName,
+        country: newCountry
+    };
+    try{
+        await addManufacturer(newManufacturer);
+        showMessage('Manufacturer added successfully!', 'success');
+    }catch (error){
+        // Handle errors
+        console.log(error)
+        const errorMessage = JSON.parse(error.message);
+        console.log(errorMessage.message);
 
-function showMessage(message, type) {
-    const messageModal = document.getElementById('messageModal');
-    const messageText = document.getElementById('messageText');
-
-    messageText.textContent = message;
-    messageModal.style.backgroundColor = type === 'success' ? '#4CAF50' : '#F44336';
-    messageModal.style.display = 'block';
-
-    if(type === "success") {
-        setTimeout(() => {
-            closeMessageModal();
-        }, 5000);
-
+        // Show the error message to the user
+        showMessage(errorMessage.message, 'failed');
     }
 }
+

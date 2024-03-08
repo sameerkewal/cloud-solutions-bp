@@ -1,0 +1,110 @@
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f8f8f8;
+    color: #333;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    background-color: #3498db;
+    color: #fff;
+    padding: 20px;
+    text-align: center;
+}
+
+#header {
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+#header h1{
+    font-size: 3em; /* Adjust the font size as needed */
+    margin-right: 20px;
+}
+
+#header a {
+    text-decoration: none; /* Remove underline */
+    color: inherit; /* Inherit the color from the parent (h1) */
+}
+
+
+
+h1, h2 {
+    color: #333;
+    margin-bottom: 10px;
+}
+
+header p {
+    font-size: 16px;
+    margin-top: 10px;
+}
+
+.main-content {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: space-between;
+}
+
+.company-info,
+.mission-values {
+    flex-basis: 48%;
+}
+
+.company-info h2,
+.mission-values h2 {
+    color: #3498db;
+}
+
+.history {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.company-info, .mission-values, .history {
+    margin-bottom: 40px;
+}
+
+.timeline {
+    position: absolute;
+    left: 10px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background-color: #007bff; /* Change the color as needed */
+    content: '';
+}
+
+.timeline-event {
+    position: relative;
+    margin-bottom: 20px;
+    padding-left: 30px;
+}
+
+.event-date {
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.event-description {
+    color: #555;
+}
+
+footer {
+    text-align: center;
+    padding: 20px;
+    background-color: #3498db;
+    color: #fff;
+}
+
+
+

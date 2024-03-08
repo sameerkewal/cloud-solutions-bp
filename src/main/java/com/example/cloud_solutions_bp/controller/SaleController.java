@@ -4,6 +4,8 @@ import com.example.cloud_solutions_bp.entities.Manufacturer;
 import com.example.cloud_solutions_bp.entities.Product;
 import com.example.cloud_solutions_bp.entities.Sale;
 import com.example.cloud_solutions_bp.entities.SaleProducts;
+import com.example.cloud_solutions_bp.observerpattern.EventManager;
+import com.example.cloud_solutions_bp.observerpattern.SmsNotificationListener;
 import com.example.cloud_solutions_bp.service.CustomerService;
 import com.example.cloud_solutions_bp.service.ProductService;
 import com.example.cloud_solutions_bp.service.SaleProductsService;
@@ -11,6 +13,8 @@ import com.example.cloud_solutions_bp.service.SaleService;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+
+import java.util.List;
 
 @Path("/sale")
 public class SaleController {
@@ -21,12 +25,17 @@ public class SaleController {
     private final CustomerService customerService;
     private final ProductService productService;
 
+    private final EventManager events;
+
 
     public SaleController() {
         this.saleService = new SaleService();
         this.saleProductsService = new SaleProductsService();
         this.customerService = new CustomerService();
         this.productService = new ProductService();
+
+        this.events = new EventManager("Add Sale");
+        this.events.subscribe("Add Sale", new SmsNotificationListener());
     }
 
     @Path("/get-all-sales")
@@ -34,47 +43,24 @@ public class SaleController {
     @Produces(MediaType.APPLICATION_JSON)
     public String getAllSales(){
         return saleProductsService.sale_vw();
-//        return "js";
+
     }
 
 
-//    @POST
-//    @Consumes(MediaType.APPLICATION_JSON)
-//    @Produces(MediaType.APPLICATION_JSON)
-//    public Response addSale(Sale newSale) {
-//        try {
-//            // Perform any validation or business logic as needed
-//            // For simplicity, let's assume the ManufacturerService has a method to add a new manufacturer
-//            Sale addedSale = saleService.add(newSale);
-//
-//            // Return a success response with the newly added manufacturer
-//            return Response.status(Response.Status.CREATED).entity(addedSale).build();
-//        } catch (Exception e) {
-//            // Handle exceptions and return an error response
-//            String errorMessage = "Error adding sale: " + e.getMessage();
-//            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-//                    .entity("{\"error\": \"" + errorMessage + "\"}")
-//                    .type(MediaType.APPLICATION_JSON_TYPE)
-//                    .build();
-//        }
-//    }
 @POST
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
-public Response addSale(Sale newSaleDTO) {
+public Response addSale(Sale saleToAdd) {
     try {
         Sale newSale = new Sale();
-        newSale.setCustomer(customerService.find(newSaleDTO.getCustomer().getId()));
-        System.out.println(newSaleDTO.getCustomer());
+        newSale.setCustomer(customerService.find(saleToAdd.getCustomer().getId()));
+        System.out.println(saleToAdd.getCustomer());
         Sale addedSale = saleService.add(newSale);
 
 
-        // Assuming SaleDTO has a List<SaleProductDTO> field named saleProducts
-        for (SaleProducts saleProductDTO : newSaleDTO.getSaleProducts()) {
-//            System.out.println("prods: " + newSaleDTO.getSaleProducts());
+        for (SaleProducts saleProductDTO : saleToAdd.getSaleProducts()) {
             Product product = productService.find(saleProductDTO.getProduct().getId());
 
-            System.out.println("product: " + product);
 
             SaleProducts saleProduct = new SaleProducts();
             saleProduct.setSale(addedSale);  // Set the Sale reference here
@@ -84,6 +70,13 @@ public Response addSale(Sale newSaleDTO) {
             // Add the SaleProducts to the Sale
             saleProductsService.add(saleProduct);
         }
+
+        StringBuilder boughtItems = new StringBuilder(addedSale.getCustomer().getFirstname() + " " + addedSale.getCustomer().getLastname() + ", you bought: ");
+        for(SaleProducts saleProducts: saleService.getProductsFromSale(addedSale)){
+            boughtItems.append("\n" + saleProducts.getProduct().getName() + "(" + saleProducts.getQuantity() + ") ");
+        }
+        events.notify("Add Sale", String.valueOf(boughtItems), addedSale.getCustomer().getPhonenumber());
+
 
 
         return Response.status(Response.Status.CREATED).entity(addedSale).build();
@@ -98,3 +91,8 @@ public Response addSale(Sale newSaleDTO) {
 
 
 }
+
+
+
+
+

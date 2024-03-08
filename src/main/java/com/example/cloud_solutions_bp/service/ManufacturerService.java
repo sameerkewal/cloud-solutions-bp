@@ -39,4 +39,9 @@ public class ManufacturerService {
     public List<Manufacturer> getAllManufacturers() {
         return manufacturerRepository.getAllManufacturers();
     }
+
+    public boolean hasExistingName(Manufacturer manufacturer){
+        return manufacturerRepository.hasExistingName(manufacturer);
+    }
+
 }

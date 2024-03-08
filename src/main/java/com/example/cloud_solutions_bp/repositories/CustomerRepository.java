@@ -1,5 +1,6 @@
 package com.example.cloud_solutions_bp.repositories;
 
+import com.example.cloud_solutions_bp.util.Util;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.Query;
@@ -15,11 +16,15 @@ import java.util.List;
 public class CustomerRepository extends Repository<Customer> {
 
     private EntityManager entityManager;
+    private final Util util;
+
 
 
     public CustomerRepository(EntityManager entityManager) {
         super(entityManager);
         this.entityManager = entityManager;
+        util = new Util();
+
     }
 
 
@@ -109,22 +114,10 @@ public class CustomerRepository extends Repository<Customer> {
 
 
         } catch (RollbackException re) {
-            if (re.getCause() instanceof ConstraintViolationException) {
-                if (transaction.isActive()) {
-                    transaction.rollback();
-                }
+            util.handleRollBackException(re, transaction);
 
-                throw (ConstraintViolationException) re.getCause();
-            }
-
-            if (transaction.isActive()) {
-                transaction.rollback();
-            } else {
-                throw re;
-            }
         }
         String jsonString = jsonArray.toString();
-        System.out.println(jsonString);
         return jsonString;
 
 
