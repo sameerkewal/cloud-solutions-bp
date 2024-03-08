@@ -165,7 +165,8 @@ function disableProductInOtherSelectLists(selectList) {
             });
         }
 
-        
+        console.log(`after adding:`)
+        console.log(addedProducts)
     });
 }
 
@@ -286,6 +287,8 @@ function destroySaleItemRow(){
         const saleItemDivToRemove = getItems().saleItemDivs[sequenceToDelete];
         
         getItems().saleItemsDiv.removeChild(saleItemDivToRemove);
+
+        addedProducts.pop()
     })
 }
 
